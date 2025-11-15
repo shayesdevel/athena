@@ -386,6 +386,27 @@ None yet - all decisions recent and active.
 **Action**: Session 02 focuses on completing foundation before delegating Issue #2 to Data Architect
 **Related**: Session 02 journal (this session)
 
+### Lesson 2: Orchestrator Must Delegate and Parallelize (CRITICAL)
+**Date**: 2025-11-15 (Session 02 - End of session directive)
+**Context**: User emphasized "moving forward -- you must be delegating and parallelizing when appropriate"
+**Lesson**:
+- **Nexus (orchestrator) primary role is COORDINATION, not implementation**
+- **Default behavior**: Delegate all implementation work to specialist agents
+- **Exception only**: Cross-cutting architecture, PR merging, conflict resolution, quality gate enforcement
+- **Parallelization**: Use parallel domain execution pattern whenever agents have independent work
+- **Expected velocity**: 3-4x speedup through parallel agent work
+
+**Action Going Forward**:
+- Session 03+: Delegate Issue #2 to Data Architect immediately
+- Launch Scribe for ongoing documentation (reduce orchestrator burden)
+- Coordinate parallel work streams (data + tests + docs simultaneously)
+- Use Task tool to launch specialist agents, not implement directly
+- Monitor, merge, validate - don't build
+
+**Why Critical**: Framework designed for parallel velocity gains. Orchestrator doing all work defeats the purpose and loses 3-4x multiplier.
+
+**Related**: Session 02 journal, ARCHITECTURE.md (Parallel Domain Execution pattern), MEM-003 (Multi-Agent Setup)
+
 ---
 
 ## Anti-Patterns to Avoid
@@ -453,5 +474,9 @@ None yet - all decisions recent and active.
 **2025-11-15 (Session 02)**: Foundation completion
 - Populated MEMORY.md with session 01 decisions
 - Created MEM-005: SAM.gov Data Source constraint (cached JSON, no API key)
-- Lesson learned: Complete foundation before delegating work
+- Lesson 1: Complete foundation before delegating work
+- Lesson 2: **CRITICAL - Orchestrator must delegate and parallelize (user directive)**
 - Anti-pattern documented: Never delegate before Gate 0 passes
+- Customized quality-gates.md (411 lines, 54+ placeholders replaced)
+- Created 6 worktrees per D013 protocol
+- Foundation 80% complete, ready for multi-agent work

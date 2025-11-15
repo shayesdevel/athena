@@ -1,4 +1,4 @@
-# Quality Gates - {PROJECT_NAME}
+# Quality Gates - Athena
 
 **Purpose**: Mandatory checkpoints all agents must pass before committing, merging, and completing work.
 
@@ -73,9 +73,14 @@
 ### Tool Verification
 - [ ] Required tools installed and accessible:
   ```bash
-  {VALIDATION_COMMAND_1}  # Example: python3 --version
-  {VALIDATION_COMMAND_2}  # Example: node --version
-  {VALIDATION_COMMAND_3}  # Example: mvn --version
+  # Java 21 (required for Gradle build)
+  java -version  # Should show Java 21.0.9+ LTS
+
+  # Gradle (wrapper included, but verify)
+  ./gradlew --version  # Should show Gradle 9.2.0
+
+  # Node.js (for frontend, once implemented)
+  node --version  # Should show Node.js 20.19+ or 22.12+
   ```
 
 ### Workspace Validation
@@ -86,8 +91,8 @@
 
 ### Documentation Access
 - [ ] Can access quality gates: `ls ../../docs/00-active/quality-gates.md`
-- [ ] Can access cognitive framework: `ls {PATH_TO_COGNITIVE_FRAMEWORK}`
-- [ ] Can access project docs: `ls {PROJECT_DOCS_PATH}`
+- [ ] Can access cognitive framework: `ls /home/shayesdevel/projects/cognitive-framework`
+- [ ] Can access project docs: `ls ../../docs/00-active/`
 
 ### Configuration Validation
 - [ ] settings.json is schema-compliant (Claude Code official schema):
@@ -104,8 +109,8 @@
   # Validate JSON syntax
   jq empty .claude/settings.json
   ```
-- [ ] If settings.json invalid: See `{PATH_TO_COGNITIVE_FRAMEWORK}/.claude/SETTINGS_CREATION_PROTOCOL.md`
-- [ ] Compare with reference: `{PATH_TO_COGNITIVE_FRAMEWORK}/examples/project-configurations/cerberus/.claude/settings.json`
+- [ ] If settings.json invalid: See `/home/shayesdevel/projects/cognitive-framework/.claude/SETTINGS_CREATION_PROTOCOL.md`
+- [ ] Compare with reference: `/home/shayesdevel/projects/cognitive-framework/examples/project-configurations/cerberus/.claude/settings.json`
 
 **If ANY pre-flight check fails: STOP and report error before starting work**
 
@@ -116,14 +121,15 @@
 ### File Hygiene (Check with `git status` frequently)
 Prevent committing:
 - ❌ Binary files: `.class`, `.jar`, `.pyc`, `.exe`, `.dll`
-- ❌ Generated files: `node_modules/`, `dist/`, `build/`, `target/`, `__pycache__/`
+- ❌ Generated files: `node_modules/`, `dist/`, `build/`, `target/`, `__pycache__/`, `.gradle/`
 - ❌ IDE files: `.idea/`, `.vscode/` (unless project-standard), `.DS_Store`
 - ❌ Secrets: `.env`, `credentials.json`, API keys, passwords
 - ❌ Large files: `>1MB` (use Git LFS if needed)
 
 **Validation command**:
 ```bash
-git status --porcelain | grep -E "{BINARY_FILE_PATTERN}"  # Should return empty
+# Check for Java class files, jars, and other binaries
+git status --porcelain | grep -E "\\.(class|jar|war|pyc|exe|dll)$"  # Should return empty
 ```
 
 ### Documentation Sync
@@ -134,7 +140,7 @@ git status --porcelain | grep -E "{BINARY_FILE_PATTERN}"  # Should return empty
 **Validation command**:
 ```bash
 # Check for broken README references (manual review)
-grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
+grep -r "athena-" ../../docs/
 ```
 
 ---
@@ -144,25 +150,31 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 ### Build Verification
 - [ ] Build succeeds (or document why skipped):
   ```bash
-  {BUILD_COMMAND}  # Example: mvn clean install
-  {BUILD_COMMAND}  # Example: npm run build
-  {BUILD_COMMAND}  # Example: make build
+  # Java/Gradle build (source ~./sdkman/bin/sdkman-init.sh && sdk use java 21.0.9-tem if needed)
+  ./gradlew build --no-daemon
+
+  # Frontend build (once implemented)
+  # cd frontend && npm run build
   ```
 
 ### Test Verification
 - [ ] Tests pass (or document why skipped):
   ```bash
-  {TEST_COMMAND}  # Example: mvn test
-  {TEST_COMMAND}  # Example: npm test
-  {TEST_COMMAND}  # Example: pytest
+  # Java tests
+  ./gradlew test --no-daemon
+
+  # Frontend tests (once implemented)
+  # cd frontend && npm test
   ```
 
 ### Code Quality (if applicable)
-- [ ] Linting passes:
+- [ ] Linting passes (optional - not yet configured):
   ```bash
-  {LINT_COMMAND}  # Example: eslint src/
-  {LINT_COMMAND}  # Example: mvn checkstyle:check
-  {LINT_COMMAND}  # Example: mypy .
+  # Java checkstyle (if configured)
+  # ./gradlew checkstyleMain checkstyleTest
+
+  # Frontend ESLint (once implemented)
+  # cd frontend && npm run lint
   ```
 
 ### Git Hygiene
@@ -170,6 +182,7 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 - [ ] **NO secrets in commit** (.env, credentials, API keys)
 - [ ] Meaningful commit message following project convention
 - [ ] Verify changes: `git diff --cached` (review what you're committing)
+- [ ] D012 attribution included: `Co-Authored-By: {AgentName} <agent@athena.project>`
 
 ### Documentation Validation
 - [ ] README references to your deliverables are accurate
@@ -177,9 +190,9 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 - [ ] Code comments added for complex logic
 
 ### Session Journal (MANDATORY)
-- [ ] **Session journal entry created**: `docs/00-active/journal/{SESSION_FILE}`
+- [ ] **Session journal entry created**: `docs/00-active/journal/session-{N}.md`
 - [ ] Journal includes: What was accomplished, decisions made, blockers encountered
-- [ ] See D014 protocol: `{PATH_TO_D014_QUICK_REF}`
+- [ ] See D014 protocol: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/quick-reference/D014-quick-ref.md`
 
 **If ANY pre-commit check fails: Fix before committing**
 
@@ -188,28 +201,33 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 ## Gate 4: Pre-Merge Validation (BEFORE PR merge)
 
 ### Integration Testing
-- [ ] All CI/CD checks passing
+- [ ] All CI/CD checks passing (once GitHub Actions configured)
 - [ ] No merge conflicts with base branch
 - [ ] Branch rebased or merged with latest base
 - [ ] Integration tests pass (if applicable):
   ```bash
-  {INTEGRATION_TEST_COMMAND}
+  # Run integration tests with Testcontainers (once implemented)
+  # ./gradlew integrationTest --no-daemon
   ```
 
 ### Cross-Reference Check
 - [ ] Changes don't break other agents' work
 - [ ] API contracts maintained (if backend changed endpoints, frontend updated)
-- [ ] Database migrations applied (if schema changed)
+- [ ] Database migrations applied (if schema changed):
+  ```bash
+  # Flyway migrations (once implemented)
+  # ./gradlew flywayMigrate
+  ```
 
 ### Documentation Handoff
 - [ ] PR description explains what changed and why
-- [ ] Links to relevant GitHub issues
+- [ ] Links to relevant GitHub issues (e.g., "Closes #2")
 - [ ] Session journal referenced in PR for context
 
 ### Quality Review
-- [ ] Code review requested (if multi-developer project)
+- [ ] Code review requested (orchestrator reviews all specialist PRs)
 - [ ] Validation gates explicitly confirmed in PR comments
-- [ ] Test coverage maintained or improved
+- [ ] Test coverage maintained or improved (target: 80%+)
 
 **If ANY pre-merge check fails: Block PR merge until resolved**
 
@@ -219,19 +237,24 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 
 ### Tracking Updates
 - [ ] GitHub issue status updated (closed or commented)
-- [ ] Relevant project docs updated (SPRINT.md, NEXT.md, etc.)
+- [ ] Relevant project docs updated (MEMORY.md, session journal)
 - [ ] Session journal confirms task completion
 
 ### Environment Validation
-- [ ] Main branch builds successfully after merge
+- [ ] Main branch builds successfully after merge:
+  ```bash
+  # Validate build on main
+  git checkout main && git pull && ./gradlew build --no-daemon
+  ```
 - [ ] Integration environment still functional (if applicable)
 - [ ] Database migrations applied (if backend changes merged):
   ```bash
-  {MIGRATION_COMMAND}  # Example: alembic upgrade head
+  # Flyway migrations (once implemented)
+  # ./gradlew flywayMigrate
   ```
 
-### Orchestrator Verification (D009)
-- [ ] Verify commits exist: `git log {BRANCH} --oneline -5`
+### Orchestrator Verification (D009b)
+- [ ] Verify commits exist: `git log main --oneline -5`
 - [ ] Verify PR exists and closed: `gh pr view {PR_NUMBER}`
 - [ ] Worktree clean: `cd {WORKTREE} && git status`
 
@@ -241,53 +264,70 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 
 ## Agent-Specific Quality Gates
 
-### Backend Agent
+### Backend Architect
 **Pre-commit additions**:
-- [ ] API endpoints tested with manual curl/Postman
-- [ ] Database migrations created (if schema changed)
-- [ ] Backend validation: `{BACKEND_VALIDATION_COMMAND}`
+- [ ] Service layer unit tests pass
+- [ ] REST controllers tested (manual curl/Postman once endpoints exist)
+- [ ] OpenAPI spec updated (if API changes)
+- [ ] Backend validation:
+  ```bash
+  ./gradlew :athena-api:test :athena-core:test --no-daemon
+  ```
 
-**Example**: `mvn clean install && mvn test`
-
-### Frontend Agent
+### Data Architect
 **Pre-commit additions**:
-- [ ] UI renders without console errors
-- [ ] Component tests pass
-- [ ] Frontend validation: `{FRONTEND_VALIDATION_COMMAND}`
+- [ ] JPA entity tests pass
+- [ ] Repository tests pass (with Testcontainers)
+- [ ] Flyway migrations created (if schema changed)
+- [ ] Database validation:
+  ```bash
+  ./gradlew :athena-core:test --no-daemon
+  # Flyway validate (once configured): ./gradlew flywayValidate
+  ```
 
-**Example**: `npm run build && npm test`
+### Frontend Specialist
+**Pre-commit additions**:
+- [ ] React component renders without console errors
+- [ ] Component tests pass (Vitest)
+- [ ] TypeScript compiles without errors
+- [ ] Frontend validation:
+  ```bash
+  cd frontend && npm run build && npm test
+  ```
 
-### Testing Agent
+### QA Specialist
 **Pre-commit additions**:
 - [ ] New tests execute successfully
-- [ ] Coverage maintained or improved
-- [ ] Testing validation: `{TESTING_VALIDATION_COMMAND}`
+- [ ] Test coverage maintained or improved (target: 80%+)
+- [ ] Integration tests pass (Testcontainers)
+- [ ] Testing validation:
+  ```bash
+  ./gradlew test --no-daemon
+  # Coverage report: ./gradlew jacocoTestReport
+  ```
 
-**Example**: `pytest --cov=. --cov-report=term`
-
-### Database Agent
+### DevOps Engineer
 **Pre-commit additions**:
-- [ ] Migrations reversible (test downgrade/upgrade)
-- [ ] Schema changes documented
-- [ ] Database validation: `{DATABASE_VALIDATION_COMMAND}`
+- [ ] Gradle build configuration valid
+- [ ] Docker builds successfully (once Dockerfile created)
+- [ ] GitHub Actions workflow syntax valid (once configured)
+- [ ] DevOps validation:
+  ```bash
+  ./gradlew build --no-daemon
+  # Docker: docker-compose build (once configured)
+  # CI/CD: actionlint .github/workflows/*.yml (once configured)
+  ```
 
-**Example**: `alembic upgrade head && alembic current`
-
-### DevOps Agent
+### Scribe
 **Pre-commit additions**:
-- [ ] Docker builds successfully
-- [ ] CI/CD pipeline syntax valid
-- [ ] DevOps validation: `{DEVOPS_VALIDATION_COMMAND}`
-
-**Example**: `docker-compose build && docker-compose config`
-
-### Docs Agent
-**Pre-commit additions**:
-- [ ] Markdown linting passes (if configured)
-- [ ] Links validated (no broken references)
-- [ ] Docs validation: `{DOCS_VALIDATION_COMMAND}`
-
-**Example**: `markdownlint docs/ && markdown-link-check docs/**/*.md`
+- [ ] Session journal follows D014 protocol
+- [ ] Markdown formatting correct
+- [ ] Links in documentation validated
+- [ ] Docs validation:
+  ```bash
+  # Markdown lint (if configured): markdownlint docs/
+  # Link check: markdown-link-check docs/**/*.md
+  ```
 
 ---
 
@@ -301,7 +341,8 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 - [ ] ✅ No binary/generated files committed (Gate 3)
 - [ ] ✅ README accurate (Gate 3)
 - [ ] ✅ **Session journal created** (Gate 3 - MANDATORY)
-- [ ] ✅ CI/CD passing (Gate 4)
+- [ ] ✅ D012 attribution included in commit (Gate 3)
+- [ ] ✅ CI/CD passing (Gate 4 - once configured)
 - [ ] ✅ No merge conflicts (Gate 4)
 - [ ] ✅ PR merged (Gate 4)
 - [ ] ✅ GitHub issue updated (Gate 5)
@@ -326,38 +367,44 @@ grep -r "{YOUR_DELIVERABLE_PATTERN}" {PROJECT_DOCS_PATH}
 
 ### Human Responsibility
 - Review quality gates during project setup
-- Customize {PLACEHOLDER} values for your tech stack
 - Enforce gates during code review
-- Update gates as project evolves
+- Update gates as project evolves (add new validation commands)
 
 ---
 
-## Tech Stack Customization
+## Tech Stack Reference
 
-**Replace these placeholders** with your project-specific commands:
+**Athena Tech Stack (as of Session 02)**:
 
-- `{VALIDATION_COMMAND_1-3}`: Tool version checks
-- `{PATH_TO_COGNITIVE_FRAMEWORK}`: Path to cognitive framework
-- `{PROJECT_DOCS_PATH}`: Path to project documentation
-- `{BINARY_FILE_PATTERN}`: Regex for binary files (e.g., `\\.class$|\\.jar$`)
-- `{BUILD_COMMAND}`: Build command (e.g., `mvn clean install`, `npm run build`)
-- `{TEST_COMMAND}`: Test command (e.g., `pytest`, `npm test`)
-- `{LINT_COMMAND}`: Linting command (e.g., `eslint`, `checkstyle`)
-- `{INTEGRATION_TEST_COMMAND}`: Integration test command
-- `{MIGRATION_COMMAND}`: Database migration command (e.g., `alembic upgrade head`)
-- `{BACKEND_VALIDATION_COMMAND}`: Backend-specific validation
-- `{FRONTEND_VALIDATION_COMMAND}`: Frontend-specific validation
-- `{TESTING_VALIDATION_COMMAND}`: Testing-specific validation
-- `{DATABASE_VALIDATION_COMMAND}`: Database-specific validation
-- `{DEVOPS_VALIDATION_COMMAND}`: DevOps-specific validation
-- `{DOCS_VALIDATION_COMMAND}`: Docs-specific validation
-- `{PATH_TO_D014_QUICK_REF}`: Path to D014 quick reference
-- `{SESSION_FILE}`: Session journal filename pattern
+**Backend**:
+- Java 21.0.9 LTS (Temurin)
+- Spring Boot 3.5.7
+- Gradle 9.2.0
+- PostgreSQL 17 + pgvector
+
+**Frontend** (to be implemented):
+- React 19.2.0
+- TypeScript 5.9.3
+- Vite 7.2.2
+- Node.js 20.19+ or 22.12+
+
+**Testing**:
+- JUnit 5.11.4
+- Mockito 5.15.2
+- Testcontainers (for integration tests)
+- Vitest (frontend, once implemented)
+
+**Build Commands**:
+- **Java build**: `./gradlew build --no-daemon`
+- **Java test**: `./gradlew test --no-daemon`
+- **Frontend build**: `cd frontend && npm run build` (once implemented)
+- **Frontend test**: `cd frontend && npm test` (once implemented)
 
 ---
 
 ## Version
 
-**Created**: {DATE}
-**Last Updated**: {DATE}
+**Created**: 2025-11-15 (Session 02)
+**Last Updated**: 2025-11-15 (Session 02)
 **Version**: 1.0
+**Customized For**: Athena project
