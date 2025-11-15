@@ -1,0 +1,69 @@
+{
+  "_comment_TEMPLATE": "This is a Claude Code settings.json template - validated against official 2025 schema",
+  "_comment_WARNING": "NEVER create settings.json from scratch - ALWAYS copy this template",
+  "_comment_CRITICAL": "This file contains ONLY valid Claude Code fields - framework-specific fields go in framework-config.json",
+  "_comment_SCHEMA": "Schema reference: cognitive-framework/.claude/SETTINGS_SCHEMA.md",
+  "_comment_PROTOCOL": "Creation protocol: cognitive-framework/.claude/SETTINGS_CREATION_PROTOCOL.md",
+  "_comment_EXAMPLE": "Working example: cognitive-framework/examples/project-configurations/cerberus/.claude/settings.json",
+  "_comment_OFFICIAL_DOCS": "Official Claude Code docs: https://code.claude.com/docs/en/settings",
+  "_comment_DEPRECATED_WARNING": "NEVER use: customShellEnv (use env), shellIntegration (invalid), lowercase hooks (use PascalCase), agents object (use .claude/agents/ directory)",
+  "permissions": {
+    "allow": [],
+    "ask": [],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ]
+  },
+  "env": {
+    "PROJECT_ROOT": "${PWD}"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-end.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-tool-use.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-tool-use.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "includeCoAuthoredBy": true
+}
