@@ -5,9 +5,6 @@ import com.athena.core.entity.Naics;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for NaicsRepository using Testcontainers.
  */
-@DataJpaTest
-
-
-
 class NaicsRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
