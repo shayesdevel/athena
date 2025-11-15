@@ -1,6 +1,6 @@
 package com.athena.core.repository;
 
-import com.athena.core.AbstractIntegrationTest;
+import com.athena.core.TestContainersConfiguration;
 import com.athena.core.entity.Naics;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for NaicsRepository using Testcontainers.
  */
-
-
-
-
-class NaicsRepositoryTest extends AbstractIntegrationTest {
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestContainersConfiguration.class)
+@org.springframework.test.context.ActiveProfiles("test")
+class NaicsRepositoryTest {
 
     @Autowired
     private NaicsRepository naicsRepository;
