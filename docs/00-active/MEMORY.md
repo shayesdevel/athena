@@ -476,6 +476,187 @@ implementation("org.glassfish:jakarta.el:4.0.2")
 
 ---
 
+
+### MEM-010: Service Layer Package Structure
+**Date**: 2025-11-15
+**Status**: ACCEPTED
+**Deciders**: Nexus (Orchestrator) + Backend Architect
+**Category**: [ARCHITECTURE]
+
+**Decision**: Service interfaces and implementations reside in the same package (com.athena.core.service), NOT in separate impl/ subdirectory
+
+**Context**:
+- Backend Architect initially placed service implementations in separate impl/ subdirectory
+- Compilation succeeded but led to inconsistent patterns vs existing services
+- Existing services (UserService, OrganizationService) have both interface + impl in same package
+
+**Problem**:
+- Wave 1-3 service implementations initially placed in `.../service/impl/` subdirectory
+- Package declarations were `com.athena.core.service.impl`
+- Created inconsistency: existing 5 services in `.../service/`, new 14 in `.../service/impl/`
+
+**Resolution**:
+- Moved all service implementations back to `.../service/` directory
+- Updated package declarations to `com.athena.core.service`
+- Verified build and tests: all 288 tests passing
+
+**Pattern Established**:
+```
+athena-core/src/main/java/com/athena/core/service/
+├── UserService.java (interface)
+├── UserServiceImpl.java (implementation)
+├── OrganizationService.java
+├── OrganizationServiceImpl.java
+... (no impl/ subdirectory)
+```
+
+**Rationale**:
+- Simpler package structure
+- Interface + implementation co-located for easier navigation
+- Matches Spring Boot best practices (many projects use same package for service layer)
+- Avoids import statements between parent/child packages
+
+**Consequences**:
+- ✅ **Positive**: Simpler, more intuitive structure
+- ✅ **Positive**: Consistent with existing codebase patterns
+- ⚠️ **Negative**: Larger package (38 files vs 19+19 split)
+- 🔧 **Mitigation**: Clear naming convention (*Service vs *ServiceImpl) maintains clarity
+
+**Related**:
+- Session 06 Journal: Package structure confusion and resolution
+- Commit 94d2848: fix: Correct service implementation locations
+
+---
+
+###  MEM-011: DTO Relationship Handling Pattern
+**Date**: 2025-11-15
+**Status**: ACCEPTED
+**Deciders**: Backend Architect
+**Category**: [ARCHITECTURE]
+
+**Decision**: DTOs use UUID references for relationships, not embedded objects
+
+**Context**:
+- Service layer needs Data Transfer Objects for API boundaries
+- Entities have JPA relationships (@ManyToOne, @OneToMany) with full object graphs
+- Need to prevent circular references, simplify serialization, improve API contracts
+
+**Pattern**:
+```java
+// Entity (JPA)
+public class Attachment {
+    @ManyToOne
+    private Opportunity opportunity; // Full object reference
+}
+
+// DTO (API)
+public record AttachmentResponseDTO(
+    UUID id,
+    UUID opportunityId, // UUID reference only
+    String fileName
+) {
+    public static AttachmentResponseDTO fromEntity(Attachment attachment) {
+        return new AttachmentResponseDTO(
+            attachment.getId(),
+            attachment.getOpportunity().getId(), // Extract ID only
+            attachment.getFileName()
+        );
+    }
+}
+```
+
+**Rationale**:
+- **Prevents circular serialization**: Entity graphs can be cyclic (Opportunity → Attachments → Opportunity)
+- **Simplifies API contracts**: Clients know exact shape of response
+- **Enables independent fetching**: Clients request related entities via separate API calls if needed
+- **Reduces payload size**: UUID (36 bytes) vs full nested object (hundreds of bytes)
+
+**Consequences**:
+- ✅ **Positive**: No Jackson `@JsonIgnore` hacks needed
+- ✅ **Positive**: Clear API contracts, easier to document with OpenAPI
+- ✅ **Positive**: Frontend can implement efficient caching strategies
+- ⚠️ **Negative**: Clients may need multiple API calls for full data (N+1 API problem)
+- 🔧 **Mitigation**: Future work - implement GraphQL or OData for flexible queries
+
+**Applied To**:
+- AttachmentService: opportunityId reference
+- AwardService: opportunityId, organizationId, agencyId references (all optional)
+- All 14 new services follow this pattern
+
+**Related**:
+- Session 06 Journal: Wave 2 relationship handling decisions
+- All ResponseDTO classes in athena-core/src/main/java/com/athena/core/dto/
+
+---
+
+### MEM-012: Repository Test Configuration - No @DataJpaTest
+**Date**: 2025-11-15
+**Status**: ACCEPTED
+**Deciders**: Nexus (Orchestrator) + QA Specialist
+**Category**: [TECH_STACK]
+
+**Decision**: Repository integration tests extend AbstractIntegrationTest with NO additional annotations (specifically, no @DataJpaTest)
+
+**Context**:
+- AbstractIntegrationTest provides Testcontainers PostgreSQL setup (MEM-006)
+- New repository tests (Attachment, Award, etc.) initially included @DataJpaTest annotation
+- 39 integration tests failing with "Failed to replace DataSource with embedded database" error
+
+**Root Cause**:
+- `@DataJpaTest` autoconfigures an embedded H2/HSQL database for testing
+- Conflicts with Testcontainers-provided PostgreSQL datasource
+- Spring tries to replace real datasource with embedded one, fails because no embedded DB on classpath
+
+**Error Message**:
+```
+java.lang.IllegalStateException: Failed to replace DataSource with an embedded database for tests.
+If you want an embedded database please put a supported one on the classpath or tune the replace 
+attribute of @AutoConfigureTestDatabase.
+```
+
+**Solution**:
+- Removed `@DataJpaTest` annotation from 6 repository tests:
+  - AttachmentRepositoryTest
+  - AwardRepositoryTest  
+  - ContractVehicleRepositoryTest
+  - NaicsRepositoryTest
+  - NoticeTypeRepositoryTest
+  - SetAsideRepositoryTest
+- Tests now simply extend AbstractIntegrationTest (no other annotations)
+
+**Correct Pattern**:
+```java
+// WRONG - Conflicts with Testcontainers
+@DataJpaTest
+class AttachmentRepositoryTest extends AbstractIntegrationTest {
+    // Tests fail with DataSource replacement error
+}
+
+// CORRECT - Uses Testcontainers from AbstractIntegrationTest
+class AttachmentRepositoryTest extends AbstractIntegrationTest {
+    @Autowired
+    private AttachmentRepository repository;
+    // Tests pass, use real PostgreSQL via Testcontainers
+}
+```
+
+**Rationale**:
+- AbstractIntegrationTest already provides all necessary test infrastructure
+- Testcontainers gives us real PostgreSQL (validates pgvector, JSONB, PostgreSQL-specific features)
+- @DataJpaTest is designed for embedded database testing, incompatible with Testcontainers approach
+
+**Consequences**:
+- ✅ **Positive**: All 288 tests passing (144 integration tests)
+- ✅ **Positive**: Tests validate PostgreSQL compatibility (not H2 compatibility)
+- ✅ **Positive**: Consistent test configuration across all repository tests
+- ⚠️ **Negative**: Slightly slower tests (real PostgreSQL vs in-memory H2)
+- 🔧 **Mitigation**: Singleton container pattern keeps startup time minimal
+
+**Related**:
+- MEM-006: AbstractIntegrationTest base class design
+- Commit 94d2848: fix: Remove conflicting @DataJpaTest annotations
+- QA Specialist: Fixed 6 repository test files
+
 ## Lessons Learned
 
 ### Lesson 1: Foundation Setup Before Agent Work
@@ -579,3 +760,13 @@ implementation("org.glassfish:jakarta.el:4.0.2")
 - Customized quality-gates.md (411 lines, 54+ placeholders replaced)
 - Created 6 worktrees per D013 protocol
 - Foundation 80% complete, ready for multi-agent work
+
+**2025-11-15 (Session 06)**: Phase 3 Service Layer completion
+- Completed all 19 services (14 new: 4 reference, 2 transactional, 8 feature)
+- Created MEM-010: Service Layer Package Structure
+- Created MEM-011: DTO Relationship Handling Pattern
+- Created MEM-012: Repository Test Configuration Pattern
+- Resolved package structure confusion (no impl/ subdirectory)
+- Fixed Testcontainers test configuration (removed @DataJpaTest)
+- All 288 tests passing (249 service unit, 144 integration)
+- Phase 3: 100% COMPLETE
