@@ -17,6 +17,7 @@ dependencies {
 
     // Bean Validation
     implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
+    implementation("org.glassfish:jakarta.el:4.0.2")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")

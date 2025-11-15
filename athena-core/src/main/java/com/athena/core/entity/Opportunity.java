@@ -111,7 +111,7 @@ public class Opportunity {
 
     @Size(max = 2)
     @Column(name = "place_of_performance_country", length = 2)
-    private String placeOfPerformanceCountry = "USA";
+    private String placeOfPerformanceCountry = "US";
 
     @NotNull
     @Column(name = "is_active", nullable = false)
@@ -134,7 +134,7 @@ public class Opportunity {
             isActive = true;
         }
         if (placeOfPerformanceCountry == null) {
-            placeOfPerformanceCountry = "USA";
+            placeOfPerformanceCountry = "US";
         }
     }
 
