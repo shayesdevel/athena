@@ -1,14 +1,10 @@
 package com.athena.core.repository;
 
-import com.athena.core.TestContainersConfiguration;
-import com.athena.core.entity.Agency;
+import com.athena.core.AbstractIntegrationTest;
 import com.athena.core.entity.Opportunity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,11 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for OpportunityRepository using Testcontainers.
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestContainersConfiguration.class)
-@org.springframework.test.context.ActiveProfiles("test")
-class OpportunityRepositoryTest {
+class OpportunityRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private OpportunityRepository opportunityRepository;
