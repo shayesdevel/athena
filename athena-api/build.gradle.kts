@@ -9,6 +9,9 @@ dependencies {
     // Spring Boot - Web MVC
     implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
 
+    // Spring Boot - Data JPA (for Page/Pageable)
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0")
+
     // Spring Boot - Validation
     implementation("org.springframework.boot:spring-boot-starter-validation:3.2.0")
 
