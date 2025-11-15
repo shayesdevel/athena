@@ -366,6 +366,7 @@ Tag decisions with categories for easier navigation:
 | MEM-003 | 2025-11-15 | Multi-Agent Setup | ACCEPTED | [ARCHITECTURE] |
 | MEM-004 | 2025-11-15 | Multi-Module Gradle Project | ACCEPTED | [ARCHITECTURE] |
 | MEM-005 | 2025-11-15 | SAM.gov Data Source (Cached JSON) | ACCEPTED | [CONSTRAINTS] |
+| MEM-006 | 2025-11-15 | Testcontainers Integration Test Config | ACCEPTED | [TECH_STACK] |
 
 ---
 
@@ -374,6 +375,104 @@ Tag decisions with categories for easier navigation:
 (When MEMORY.md grows too large, move old ACCEPTED decisions to ARCHITECTURE.md)
 
 None yet - all decisions recent and active.
+
+---
+
+### MEM-006: Testcontainers Integration Test Configuration
+**Date**: 2025-11-15
+**Status**: ACCEPTED
+**Deciders**: QA Specialist + DevOps Engineer
+**Category**: [TECH_STACK]
+
+**Decision**: Use AbstractIntegrationTest base class with singleton PostgreSQL container for all integration tests
+
+**Context**:
+- Integration tests written for 5 core entities (User, Organization, Opportunity, Agency, Contact)
+- Tests failing at runtime with multiple configuration issues
+- Need reliable, fast integration testing infrastructure for TDD workflow
+- Docker/Testcontainers chosen as industry-standard approach for database integration tests
+
+**Root Causes Identified**:
+
+**Issue 1: Missing Jakarta EL Dependency**
+- Error: `ClassNotFoundException: jakarta.el.ELManager`
+- Cause: Hibernate Validator 8.x requires Jakarta Expression Language for bean validation message interpolation
+- Impact: Spring context failed to initialize, all tests failed before running
+
+**Issue 2: Invalid Bean Validation Constraint**
+- Error: `ConstraintViolationException: size must be between 0 and 2` on Opportunity.placeOfPerformanceCountry
+- Cause: Default value "USA" (3 characters) violated `@Size(max=2)` constraint
+- Impact: 6 Opportunity tests failed after fixing Issue 1
+
+**Issue 3: Testcontainers Configuration Pattern**
+- Original: `@Import(TestContainersConfiguration.class)` with `@DynamicPropertySource` in separate config class
+- Problem: Spring test context not consistently applying datasource properties from `@DynamicPropertySource`
+- Impact: Inconsistent test failures, difficult to debug
+
+**Solution Implemented**:
+
+**1. Added Jakarta EL Dependency**:
+```kotlin
+implementation("org.glassfish:jakarta.el:4.0.2")
+```
+- Compatible with Jakarta EE 9+ (Spring Boot 3.x requirement)
+- Required by Hibernate Validator 8.0.1.Final
+- Standard dependency for bean validation with EL expression support
+
+**2. Fixed Country Code Constraint**:
+- Changed default from "USA" (3 chars) to "US" (2 chars)
+- Follows ISO 3166-1 alpha-2 standard (international standard for 2-character country codes)
+- Matches database schema (VARCHAR(2))
+- Aligns with SAM.gov API data format
+
+**3. Refactored Testcontainers Setup**:
+- Created `AbstractIntegrationTest` base class
+- All repository tests extend this base class (inheritance pattern)
+- Single PostgreSQL container instance shared across all tests (singleton pattern)
+- `@DynamicPropertySource` method in base class properly configures Spring datasource properties
+- Container marked with `.withReuse(true)` for performance
+
+**Why This Approach**:
+- **Simplicity**: One base class, all tests extend it - clear and consistent
+- **Performance**: Singleton container shared across 18 tests (faster than per-class containers)
+- **Spring Best Practice**: `@DynamicPropertySource` in base class guarantees property application order
+- **Maintainability**: Future integration tests just extend AbstractIntegrationTest
+- **Reliability**: Consistent container lifecycle management
+
+**Consequences**:
+- ✅ **Positive**:
+  - All 18 integration tests passing (UserRepository: 5, OrganizationRepository: 6, OpportunityRepository: 7)
+  - Fast test execution (container reuse, shared instance)
+  - Simple test authoring (extend base class, inject repository, write tests)
+  - Unblocks Data Architect for new entity validation
+  - Enables CI/CD pipeline implementation
+  - Supports TDD workflow going forward
+- ⚠️ **Negative**:
+  - Single container shared across tests (test isolation concerns if not careful)
+  - Container runs for full test suite duration (memory overhead)
+  - Requires Docker running (development environment dependency)
+- 🔧 **Mitigation**:
+  - Tests use `@DataJpaTest` with `hibernate.ddl-auto=create-drop` for clean state per test class
+  - Container memory footprint minimal (postgres:17-alpine)
+  - Docker Desktop already required for project (documented in setup)
+
+**Alternatives Considered**:
+1. **Per-test-class containers**: Rejected - Slower (18 container starts vs 1), resource-intensive
+2. **@Testcontainers + @Container annotations**: Rejected - More boilerplate, less explicit control
+3. **Embedded H2 database**: Rejected - PostgreSQL-specific features (pgvector, JSONB) required
+4. **Spring's @DataJpaTest alone**: Rejected - Requires in-memory DB, doesn't validate PostgreSQL compatibility
+
+**Impact**:
+- ✅ **Unblocks**: Data Architect can validate new entities with integration tests
+- ✅ **Unblocks**: CI/CD pipeline can enforce "all tests pass" quality gate
+- ✅ **Unblocks**: TDD workflow for all future feature development
+- ✅ **Enables**: D009 verification protocol (commit verification requires passing tests)
+
+**Related**:
+- PR #14: https://github.com/shayesdevel/athena/pull/14
+- Files: `AbstractIntegrationTest.java`, `athena-core/build.gradle.kts`
+- D009 Protocol: Commit verification requires passing tests
+- Quality Gates: Gate 3 (pre-commit) enforces test success
 
 ---
 
