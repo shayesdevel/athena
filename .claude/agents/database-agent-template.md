@@ -1,5 +1,3 @@
-# Database Agent Context ({AGENT_CODENAME})
-
 ---
 name: database
 description: Use when optimizing database queries, fixing N+1 query problems, designing index strategy, or handling complex migrations. Automatically invoke for performance issues (p95 >500ms), database-heavy work, or schema changes.

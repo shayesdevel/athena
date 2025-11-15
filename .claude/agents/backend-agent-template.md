@@ -1,5 +1,3 @@
-# Backend Agent Context ({AGENT_CODENAME})
-
 ---
 name: backend
 description: Use when implementing API endpoints, database models, business logic services, or background tasks. Automatically invoke for {BACKEND_FRAMEWORK} development, ORM changes, and database schema updates.

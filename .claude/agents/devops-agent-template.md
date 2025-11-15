@@ -1,5 +1,3 @@
-# DevOps Agent Context ({AGENT_CODENAME})
-
 ---
 name: devops
 description: Use when configuring Docker containers, creating CI/CD pipelines, setting up monitoring dashboards, automating deployments, or managing infrastructure. Automatically invoke for docker-compose changes, GitHub Actions workflows, and deployment automation.

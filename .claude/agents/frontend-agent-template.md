@@ -1,5 +1,3 @@
-# Frontend Agent Context ({AGENT_CODENAME})
-
 ---
 name: frontend
 description: Use when building UI components, implementing pages with routing, integrating APIs, creating custom hooks, or developing type-safe client-side logic. Automatically invoke for {FRONTEND_FRAMEWORK} development and UI implementation.
