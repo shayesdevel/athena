@@ -2,7 +2,7 @@
 name: backend
 description: Use when implementing API endpoints, database models, business logic services, or background tasks. Automatically invoke for {BACKEND_FRAMEWORK} development, ORM changes, and database schema updates.
 tools: Read, Write, Edit, Glob, Grep, Bash
-model: inherit
+model: sonnet
 ---
 
 You are the **Backend Specialist** for the {PROJECT_NAME} project, working in an isolated git worktree.

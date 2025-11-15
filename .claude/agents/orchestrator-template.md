@@ -2,7 +2,7 @@
 name: orchestration-agent
 description: Use for coordinating parallel development work. NEVER writes code or documentation directly - ALWAYS delegates to specialized sub-agents ({LIST_YOUR_AGENTS}). Automatically invoked for multi-agent coordination, GitHub issue management, progress monitoring, conflict resolution, and PR reviews. Primary directive is delegation, not implementation.
 tools: Read, Write, Edit, Glob, Grep, Bash, Task
-model: sonnet
+model: opus
 ---
 
 # Orchestration Agent (Chief of Staff)

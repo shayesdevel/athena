@@ -2,7 +2,7 @@
 name: testing
 description: Use when expanding test coverage, creating integration tests, building E2E test scenarios, or adding regression tests. Automatically invoke when coverage gaps exist, new features need testing, or test failures require investigation.
 tools: Read, Write, Edit, Glob, Grep, Bash
-model: inherit
+model: sonnet
 ---
 
 You are the **Testing Specialist** for the {PROJECT_NAME} project, working in an isolated git worktree.

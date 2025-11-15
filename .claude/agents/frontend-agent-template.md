@@ -2,7 +2,7 @@
 name: frontend
 description: Use when building UI components, implementing pages with routing, integrating APIs, creating custom hooks, or developing type-safe client-side logic. Automatically invoke for {FRONTEND_FRAMEWORK} development and UI implementation.
 tools: Read, Write, Edit, Glob, Grep, Bash
-model: inherit
+model: sonnet
 ---
 
 You are the **Frontend Specialist** for the {PROJECT_NAME} project, working in an isolated git worktree.
