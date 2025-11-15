@@ -1,6 +1,6 @@
 package com.athena.core.repository;
 
-import com.athena.core.TestContainersConfiguration;
+import com.athena.core.AbstractIntegrationTest;
 import com.athena.core.entity.Attachment;
 import com.athena.core.entity.Opportunity;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for AttachmentRepository using Testcontainers.
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestContainersConfiguration.class)
-@org.springframework.test.context.ActiveProfiles("test")
-class AttachmentRepositoryTest {
+
+
+
+
+class AttachmentRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private AttachmentRepository attachmentRepository;

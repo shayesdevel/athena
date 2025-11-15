@@ -1,6 +1,6 @@
 package com.athena.core.repository;
 
-import com.athena.core.TestContainersConfiguration;
+import com.athena.core.AbstractIntegrationTest;
 import com.athena.core.entity.Award;
 import com.athena.core.entity.Opportunity;
 import com.athena.core.entity.Organization;
@@ -21,11 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for AwardRepository using Testcontainers.
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestContainersConfiguration.class)
-@org.springframework.test.context.ActiveProfiles("test")
-class AwardRepositoryTest {
+
+
+
+
+class AwardRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private AwardRepository awardRepository;
