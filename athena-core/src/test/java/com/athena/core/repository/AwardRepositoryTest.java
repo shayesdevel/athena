@@ -1,15 +1,15 @@
 package com.athena.core.repository;
 
-import com.athena.core.TestContainersConfiguration;
+import com.athena.core.AbstractIntegrationTest;
 import com.athena.core.entity.Award;
 import com.athena.core.entity.Opportunity;
 import com.athena.core.entity.Organization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,10 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for AwardRepository using Testcontainers.
  */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(TestContainersConfiguration.class)
-@org.springframework.test.context.ActiveProfiles("test")
-class AwardRepositoryTest {
+
+
+
+class AwardRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private AwardRepository awardRepository;
