@@ -1,9 +1,12 @@
 package com.athena.core.repository;
 
-import com.athena.core.AbstractIntegrationTest;
+import com.athena.core.TestContainersConfiguration;
 import com.athena.core.entity.NoticeType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for NoticeTypeRepository using Testcontainers.
  */
-class NoticeTypeRepositoryTest extends AbstractIntegrationTest {
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestContainersConfiguration.class)
+@org.springframework.test.context.ActiveProfiles("test")
+class NoticeTypeRepositoryTest {
 
     @Autowired
     private NoticeTypeRepository noticeTypeRepository;
