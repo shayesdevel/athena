@@ -28,6 +28,10 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
     implementation("org.glassfish:jakarta.el:4.0.2")
 
+    // JSON processing (Jackson with Java 8 date/time support)
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
@@ -35,6 +39,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
 
     // External client testing
-    testImplementation("org.wiremock:wiremock-standalone:3.3.1") // HTTP API mocking
-    testImplementation("com.icegreen:greenmail-junit5:2.0.1")     // SMTP testing
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")      // Backend Architect's HTTP mocking
+    testImplementation("org.wiremock:wiremock-standalone:3.3.1")          // QA Specialist's HTTP mocking
+    testImplementation("com.icegreen:greenmail-junit5:2.0.1")             // SMTP testing
 }

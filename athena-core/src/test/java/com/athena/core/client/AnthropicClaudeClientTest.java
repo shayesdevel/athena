@@ -1,171 +1,199 @@
 package com.athena.core.client;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.Disabled;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Integration tests for Anthropic Claude API client.
- * Uses WireMock to mock Claude API responses.
- *
- * <p>Tests cover:
- * <ul>
- *   <li>Successful API calls (200 OK with JSON response)</li>
- *   <li>Authentication errors (401 Unauthorized)</li>
- *   <li>Rate limiting (429 Too Many Requests)</li>
- *   <li>Server errors (500 Internal Server Error)</li>
- *   <li>Timeout handling</li>
- * </ul>
- * </p>
- *
- * <p>Note: Tests are disabled until AnthropicClaudeClient is implemented by Backend Architect.</p>
+ * Unit tests for AnthropicClaudeClient.
+ * Uses MockWebServer to simulate Claude API responses.
  */
-@Disabled("Waiting for AnthropicClaudeClient implementation from Backend Architect")
-public class AnthropicClaudeClientTest extends AbstractExternalClientTest {
+class AnthropicClaudeClientTest {
 
-    // TODO: Inject AnthropicClaudeClient once implemented
-    // @Autowired
-    // private AnthropicClaudeClient claudeClient;
+    private MockWebServer mockWebServer;
+    private AnthropicClaudeClient client;
+    private ObjectMapper objectMapper;
 
-    @Test
-    void testSuccessfulApiCall() {
-        // Given: Mock successful Claude API response
-        String mockResponse = """
-            {
-              "id": "msg_01ABC123",
-              "type": "message",
-              "role": "assistant",
-              "content": [
-                {
-                  "type": "text",
-                  "text": "This opportunity has high relevance for AI/ML services."
-                }
-              ],
-              "model": "claude-3-5-sonnet-20241022",
-              "stop_reason": "end_turn",
-              "usage": {
-                "input_tokens": 150,
-                "output_tokens": 50
-              }
-            }
-            """;
+    @BeforeEach
+    void setUp() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
 
-        wireMockServer.stubFor(post(urlPathEqualTo("/v1/messages"))
-                .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer"))
-                .withHeader("anthropic-version", equalTo("2023-06-01"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(mockResponse)));
+        objectMapper = new ObjectMapper();
 
-        // When: Call Claude API client
-        // TODO: Implement once AnthropicClaudeClient exists
-        // String result = claudeClient.analyzeOpportunity(prompt);
+        // Create client pointing to mock server
+        String baseUrl = mockWebServer.url("/").toString();
+        client = new AnthropicClaudeClient(
+            "test-api-key",
+            baseUrl,
+            "claude-3-5-sonnet-20241022",
+            objectMapper
+        );
+    }
 
-        // Then: Verify response parsed correctly
-        // assertNotNull(result);
-        // assertTrue(result.contains("high relevance"));
-
-        // Verify API called with correct parameters
-        wireMockServer.verify(postRequestedFor(urlPathEqualTo("/v1/messages"))
-                .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer"))
-                .withHeader("anthropic-version", equalTo("2023-06-01"))
-                .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE)));
+    @AfterEach
+    void tearDown() throws IOException {
+        mockWebServer.shutdown();
     }
 
     @Test
-    void testUnauthorizedError() {
-        // Given: Mock 401 Unauthorized response
-        wireMockServer.stubFor(post(urlPathEqualTo("/v1/messages"))
-                .willReturn(aResponse()
-                        .withStatus(401)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody("""
-                            {
-                              "type": "error",
-                              "error": {
-                                "type": "authentication_error",
-                                "message": "invalid x-api-key"
-                              }
-                            }
-                            """)));
+    void testSendMessage_success() throws InterruptedException {
+        // Mock successful response
+        String mockResponse = "{\n" +
+            "  \"id\": \"msg_123\",\n" +
+            "  \"type\": \"message\",\n" +
+            "  \"role\": \"assistant\",\n" +
+            "  \"content\": [{\"type\": \"text\", \"text\": \"This is a test response\"}],\n" +
+            "  \"model\": \"claude-3-5-sonnet-20241022\",\n" +
+            "  \"stop_reason\": \"end_turn\",\n" +
+            "  \"usage\": {\"input_tokens\": 10, \"output_tokens\": 20}\n" +
+            "}";
 
-        // When/Then: Expect exception for unauthorized access
-        // TODO: Implement once AnthropicClaudeClient exists
-        // assertThrows(AuthenticationException.class, () -> {
-        //     claudeClient.analyzeOpportunity(prompt);
-        // });
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(mockResponse)
+            .setHeader("Content-Type", "application/json"));
+
+        // Execute
+        String response = client.sendMessage("You are a helpful assistant", "Hello!", 100);
+
+        // Verify response
+        assertEquals("This is a test response", response);
+
+        // Verify request
+        RecordedRequest request = mockWebServer.takeRequest();
+        assertEquals("/v1/messages", request.getPath());
+        assertEquals("POST", request.getMethod());
+        assertTrue(request.getHeader("x-api-key").equals("test-api-key"));
+        assertTrue(request.getHeader("anthropic-version").equals("2023-06-01"));
     }
 
     @Test
-    void testRateLimitError() {
-        // Given: Mock 429 Rate Limited response
-        wireMockServer.stubFor(post(urlPathEqualTo("/v1/messages"))
-                .willReturn(aResponse()
-                        .withStatus(429)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withHeader("retry-after", "60")
-                        .withBody("""
-                            {
-                              "type": "error",
-                              "error": {
-                                "type": "rate_limit_error",
-                                "message": "Rate limit exceeded"
-                              }
-                            }
-                            """)));
+    void testScoreOpportunity_success() throws InterruptedException {
+        // Mock Claude response with score format
+        String mockResponse = "{\n" +
+            "  \"id\": \"msg_456\",\n" +
+            "  \"type\": \"message\",\n" +
+            "  \"role\": \"assistant\",\n" +
+            "  \"content\": [{\"type\": \"text\", \"text\": \"SCORE: 85\\nRATIONALE: Good fit\"}],\n" +
+            "  \"model\": \"claude-3-5-sonnet-20241022\",\n" +
+            "  \"stop_reason\": \"end_turn\",\n" +
+            "  \"usage\": {\"input_tokens\": 50, \"output_tokens\": 30}\n" +
+            "}";
 
-        // When/Then: Expect exception with retry information
-        // TODO: Implement once AnthropicClaudeClient exists
-        // RateLimitException ex = assertThrows(RateLimitException.class, () -> {
-        //     claudeClient.analyzeOpportunity(prompt);
-        // });
-        // assertEquals(60, ex.getRetryAfterSeconds());
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(mockResponse)
+            .setHeader("Content-Type", "application/json"));
+
+        // Execute
+        AnthropicClaudeClient.OpportunityScoreResult result = client.scoreOpportunity(
+            "Cloud Infrastructure Services",
+            "Provide AWS cloud infrastructure",
+            "Expert in AWS services"
+        );
+
+        // Verify
+        assertEquals(85, result.getScore());
+        assertEquals("Good fit", result.getRationale());
     }
 
     @Test
-    void testServerError() {
-        // Given: Mock 500 Internal Server Error
-        wireMockServer.stubFor(post(urlPathEqualTo("/v1/messages"))
-                .willReturn(aResponse()
-                        .withStatus(500)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody("""
-                            {
-                              "type": "error",
-                              "error": {
-                                "type": "internal_server_error",
-                                "message": "An internal server error occurred"
-                              }
-                            }
-                            """)));
+    void testGenerateCaptureStrategy_success() throws InterruptedException {
+        // Mock strategy response
+        String mockResponse = "{\n" +
+            "  \"id\": \"msg_789\",\n" +
+            "  \"type\": \"message\",\n" +
+            "  \"role\": \"assistant\",\n" +
+            "  \"content\": [{\"type\": \"text\", \"text\": \"Win Theme 1: Technical excellence...\"}],\n" +
+            "  \"model\": \"claude-3-5-sonnet-20241022\",\n" +
+            "  \"stop_reason\": \"end_turn\",\n" +
+            "  \"usage\": {\"input_tokens\": 100, \"output_tokens\": 200}\n" +
+            "}";
 
-        // When/Then: Expect exception for server error
-        // TODO: Implement once AnthropicClaudeClient exists
-        // assertThrows(ApiException.class, () -> {
-        //     claudeClient.analyzeOpportunity(prompt);
-        // });
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(mockResponse)
+            .setHeader("Content-Type", "application/json"));
+
+        // Execute
+        String strategy = client.generateCaptureStrategy(
+            "IT Support Services",
+            "Provide helpdesk and IT support",
+            "24/7 support capability"
+        );
+
+        // Verify
+        assertTrue(strategy.contains("Win Theme 1"));
+        assertTrue(strategy.contains("Technical excellence"));
     }
 
     @Test
-    void testTimeoutHandling() {
-        // Given: Mock delayed response (exceeds timeout)
-        wireMockServer.stubFor(post(urlPathEqualTo("/v1/messages"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .withBody("{}")
-                        .withFixedDelay(10000))); // 10 second delay
+    void testAnalyzeCompetitors_success() throws InterruptedException {
+        // Mock competitive analysis response
+        String mockResponse = "{\n" +
+            "  \"id\": \"msg_abc\",\n" +
+            "  \"type\": \"message\",\n" +
+            "  \"role\": \"assistant\",\n" +
+            "  \"content\": [{\"type\": \"text\", \"text\": \"Competitor Analysis: Strong in X...\"}],\n" +
+            "  \"model\": \"claude-3-5-sonnet-20241022\",\n" +
+            "  \"stop_reason\": \"end_turn\",\n" +
+            "  \"usage\": {\"input_tokens\": 80, \"output_tokens\": 150}\n" +
+            "}";
 
-        // When/Then: Expect timeout exception
-        // TODO: Implement once AnthropicClaudeClient exists
-        // assertThrows(TimeoutException.class, () -> {
-        //     claudeClient.analyzeOpportunity(prompt);
-        // }, "API call should timeout after configured duration");
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(mockResponse)
+            .setHeader("Content-Type", "application/json"));
+
+        // Execute
+        String analysis = client.analyzeCompetitors(
+            "Cybersecurity Services",
+            "Competitor A: CMMI Level 3, Competitor B: ISO 27001"
+        );
+
+        // Verify
+        assertTrue(analysis.contains("Competitor Analysis"));
+        assertTrue(analysis.contains("Strong in X"));
+    }
+
+    @Test
+    void testSendMessage_apiError() {
+        // Mock error response
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(429)
+            .setBody("{\"error\": \"rate_limit_exceeded\"}"));
+
+        // Execute and verify exception
+        assertThrows(AnthropicClaudeClient.ClaudeApiException.class, () -> {
+            client.sendMessage("System prompt", "User message", 100);
+        });
+    }
+
+    @Test
+    void testSendMessage_emptyResponse() {
+        // Mock response with empty content
+        String mockResponse = "{\n" +
+            "  \"id\": \"msg_empty\",\n" +
+            "  \"type\": \"message\",\n" +
+            "  \"role\": \"assistant\",\n" +
+            "  \"content\": [],\n" +
+            "  \"model\": \"claude-3-5-sonnet-20241022\",\n" +
+            "  \"stop_reason\": \"end_turn\",\n" +
+            "  \"usage\": {\"input_tokens\": 10, \"output_tokens\": 0}\n" +
+            "}";
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(mockResponse)
+            .setHeader("Content-Type", "application/json"));
+
+        // Execute and verify exception
+        assertThrows(AnthropicClaudeClient.ClaudeApiException.class, () -> {
+            client.sendMessage("System", "Message", 100);
+        });
     }
 }

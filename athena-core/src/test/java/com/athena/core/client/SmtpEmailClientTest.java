@@ -1,183 +1,180 @@
 package com.athena.core.client;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.ArgumentCaptor;
+import org.springframework.mail.javamail.JavaMailSender;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
- * Integration tests for SMTP email client.
- * Uses GreenMail embedded email server to test email sending without real SMTP server.
- *
- * <p>Tests cover:
- * <ul>
- *   <li>Plain text email sending</li>
- *   <li>HTML email sending</li>
- *   <li>Email templates (opportunity alerts, weekly digests)</li>
- *   <li>Recipient verification</li>
- *   <li>Subject and content validation</li>
- * </ul>
- * </p>
- *
- * <p>Note: Tests are disabled until SmtpEmailClient is implemented by Backend Architect.</p>
+ * Unit tests for SmtpEmailClient.
+ * Uses mocked JavaMailSender to verify email sending logic.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-@Disabled("Waiting for SmtpEmailClient implementation from Backend Architect")
-public class SmtpEmailClientTest {
+class SmtpEmailClientTest {
 
-    /**
-     * GreenMail extension provides embedded SMTP server for testing.
-     * Server starts before each test and stops after.
-     */
-    @RegisterExtension
-    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-            .withConfiguration(GreenMailConfiguration.aConfig().withUser("test@athena.local", "password"))
-            .withPerMethodLifecycle(false);
+    private JavaMailSender mockMailSender;
+    private SmtpEmailClient emailClient;
+    private MimeMessage mockMimeMessage;
 
-    // TODO: Inject SmtpEmailClient once implemented
-    // @Autowired
-    // private SmtpEmailClient emailClient;
+    @BeforeEach
+    void setUp() {
+        mockMailSender = mock(JavaMailSender.class);
+        mockMimeMessage = mock(MimeMessage.class);
 
-    @Test
-    void testSendPlainTextEmail() throws MessagingException {
-        // When: Send plain text email
-        // TODO: Implement once SmtpEmailClient exists
-        // emailClient.sendEmail(
-        //     "recipient@example.com",
-        //     "Test Subject",
-        //     "This is a plain text email body."
-        // );
+        when(mockMailSender.createMimeMessage()).thenReturn(mockMimeMessage);
 
-        // Then: Verify email received
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        // assertEquals(1, receivedMessages.length);
-
-        // MimeMessage message = receivedMessages[0];
-        // assertEquals("Test Subject", message.getSubject());
-        // assertEquals("recipient@example.com", message.getAllRecipients()[0].toString());
-        // assertTrue(message.getContent().toString().contains("plain text email body"));
+        emailClient = new SmtpEmailClient(mockMailSender, "test@athena.local", true);
     }
 
     @Test
-    void testSendHtmlEmail() throws MessagingException {
-        // When: Send HTML email
-        // TODO: Implement once SmtpEmailClient exists
-        // String htmlContent = """
-        //     <html>
-        //     <body>
-        //         <h1>Opportunity Alert</h1>
-        //         <p>A new opportunity has been posted.</p>
-        //     </body>
-        //     </html>
-        //     """;
-        // emailClient.sendHtmlEmail(
-        //     "recipient@example.com",
-        //     "Opportunity Alert",
-        //     htmlContent
-        // );
+    void testSendTextEmail_success() {
+        // Execute
+        emailClient.sendTextEmail("user@example.com", "Test Subject", "Test body");
 
-        // Then: Verify HTML email received
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        // assertEquals(1, receivedMessages.length);
-
-        // MimeMessage message = receivedMessages[0];
-        // assertEquals("Opportunity Alert", message.getSubject());
-        // assertTrue(message.getContentType().contains("text/html"));
-        // assertTrue(message.getContent().toString().contains("<h1>Opportunity Alert</h1>"));
+        // Verify mail sender was called
+        verify(mockMailSender, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
-    void testOpportunityAlertTemplate() throws MessagingException {
-        // Given: Opportunity details
-        // TODO: Implement once SmtpEmailClient exists
-        // String opportunityTitle = "IT Services for Federal Agency";
-        // String solicitationNumber = "SOL-2025-001";
-        // String deadline = "2025-12-15";
-        // String link = "https://sam.gov/opp/SOL-2025-001";
+    void testSendHtmlEmail_success() {
+        // Execute
+        emailClient.sendHtmlEmail("user@example.com", "Test Subject", "<h1>HTML Body</h1>");
 
-        // When: Send opportunity alert email
-        // emailClient.sendOpportunityAlert(
-        //     "user@example.com",
-        //     opportunityTitle,
-        //     solicitationNumber,
-        //     deadline,
-        //     link
-        // );
-
-        // Then: Verify email contains all details
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        // assertEquals(1, receivedMessages.length);
-
-        // MimeMessage message = receivedMessages[0];
-        // assertTrue(message.getSubject().contains(solicitationNumber));
-        // String content = message.getContent().toString();
-        // assertTrue(content.contains(opportunityTitle));
-        // assertTrue(content.contains(deadline));
-        // assertTrue(content.contains(link));
+        // Verify mail sender was called
+        verify(mockMailSender, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
-    void testWeeklyDigestTemplate() throws MessagingException {
-        // Given: Weekly digest data
-        // TODO: Implement once SmtpEmailClient exists
-        // List<OpportunitySummary> opportunities = List.of(
-        //     new OpportunitySummary("SOL-001", "IT Services", "2025-12-15"),
-        //     new OpportunitySummary("SOL-002", "Consulting", "2025-12-20")
-        // );
+    void testSendOpportunityAlert_success() {
+        // Execute
+        emailClient.sendOpportunityAlert(
+            "user@example.com",
+            "Cloud Infrastructure Services",
+            88,
+            "SOL-2025-001",
+            LocalDate.of(2025, 3, 15),
+            "https://sam.gov/opp/123"
+        );
 
-        // When: Send weekly digest
-        // emailClient.sendWeeklyDigest("user@example.com", opportunities, "2025-11-15");
-
-        // Then: Verify digest contains all opportunities
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        // assertEquals(1, receivedMessages.length);
-
-        // MimeMessage message = receivedMessages[0];
-        // assertTrue(message.getSubject().contains("Weekly Digest"));
-        // String content = message.getContent().toString();
-        // assertTrue(content.contains("SOL-001"));
-        // assertTrue(content.contains("SOL-002"));
-        // assertTrue(content.contains("IT Services"));
-        // assertTrue(content.contains("Consulting"));
+        // Verify mail sender was called
+        verify(mockMailSender, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
-    void testMultipleRecipients() throws MessagingException {
-        // When: Send email to multiple recipients
-        // TODO: Implement once SmtpEmailClient exists
-        // emailClient.sendEmail(
-        //     List.of("user1@example.com", "user2@example.com", "user3@example.com"),
-        //     "Team Alert",
-        //     "This is a team-wide notification."
-        // );
+    void testSendWeeklyDigest_success() {
+        // Create opportunity summaries
+        List<SmtpEmailClient.OpportunitySummary> opportunities = Arrays.asList(
+            new SmtpEmailClient.OpportunitySummary("Opportunity 1", 85, LocalDate.of(2025, 3, 1)),
+            new SmtpEmailClient.OpportunitySummary("Opportunity 2", 92, LocalDate.of(2025, 3, 5)),
+            new SmtpEmailClient.OpportunitySummary("Opportunity 3", 78, LocalDate.of(2025, 3, 10))
+        );
 
-        // Then: Verify all recipients received email
-        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
-        // assertEquals(3, receivedMessages.length);
+        // Execute
+        emailClient.sendWeeklyDigest(
+            "user@example.com",
+            LocalDate.of(2025, 2, 24),
+            LocalDate.of(2025, 3, 2),
+            opportunities
+        );
 
-        // for (MimeMessage message : receivedMessages) {
-        //     assertEquals("Team Alert", message.getSubject());
-        //     assertTrue(message.getContent().toString().contains("team-wide notification"));
-        // }
+        // Verify mail sender was called
+        verify(mockMailSender, times(1)).send(any(MimeMessage.class));
     }
 
     @Test
-    void testEmailSendingFailure() {
-        // Given: Invalid SMTP configuration (wrong host/port)
-        // TODO: Implement once SmtpEmailClient exists
+    void testSendTeamNotification_success() {
+        // Execute
+        emailClient.sendTeamNotification(
+            "user@example.com",
+            "Alpha Team",
+            "Cloud Services RFP",
+            "Proposal review meeting scheduled for tomorrow at 2 PM"
+        );
 
-        // When/Then: Expect exception for SMTP failure
-        // assertThrows(EmailSendException.class, () -> {
-        //     emailClient.sendEmail("recipient@example.com", "Subject", "Body");
-        // });
+        // Verify mail sender was called
+        verify(mockMailSender, times(1)).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void testSendTextEmail_disabled() {
+        // Create disabled client
+        SmtpEmailClient disabledClient = new SmtpEmailClient(mockMailSender, "test@athena.local", false);
+
+        // Execute
+        disabledClient.sendTextEmail("user@example.com", "Subject", "Body");
+
+        // Verify mail sender was NOT called
+        verify(mockMailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void testSendHtmlEmail_disabled() {
+        // Create disabled client
+        SmtpEmailClient disabledClient = new SmtpEmailClient(mockMailSender, "test@athena.local", false);
+
+        // Execute
+        disabledClient.sendHtmlEmail("user@example.com", "Subject", "<p>Body</p>");
+
+        // Verify mail sender was NOT called
+        verify(mockMailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void testSendTextEmail_messagingException() {
+        // Mock exception during send
+        doThrow(new RuntimeException("SMTP connection failed"))
+            .when(mockMailSender).send(any(MimeMessage.class));
+
+        // Execute and verify exception
+        assertThrows(SmtpEmailClient.EmailException.class, () -> {
+            emailClient.sendTextEmail("user@example.com", "Subject", "Body");
+        });
+    }
+
+    @Test
+    void testSendHtmlEmail_messagingException() {
+        // Mock exception during send
+        doThrow(new RuntimeException("SMTP connection failed"))
+            .when(mockMailSender).send(any(MimeMessage.class));
+
+        // Execute and verify exception
+        assertThrows(SmtpEmailClient.EmailException.class, () -> {
+            emailClient.sendHtmlEmail("user@example.com", "Subject", "<p>Body</p>");
+        });
+    }
+
+    @Test
+    void testOpportunitySummary_getters() {
+        // Create summary
+        SmtpEmailClient.OpportunitySummary summary = new SmtpEmailClient.OpportunitySummary(
+            "Test Opportunity",
+            85,
+            LocalDate.of(2025, 3, 15)
+        );
+
+        // Verify getters
+        assertEquals("Test Opportunity", summary.getTitle());
+        assertEquals(85, summary.getScore());
+        assertEquals(LocalDate.of(2025, 3, 15), summary.getDeadline());
+    }
+
+    @Test
+    void testEmailException_withCause() {
+        // Create exception with cause
+        Exception cause = new MessagingException("Root cause");
+        SmtpEmailClient.EmailException exception = new SmtpEmailClient.EmailException("Email failed", cause);
+
+        // Verify
+        assertEquals("Email failed", exception.getMessage());
+        assertEquals(cause, exception.getCause());
     }
 }
