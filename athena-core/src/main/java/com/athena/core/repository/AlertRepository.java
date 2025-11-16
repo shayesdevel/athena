@@ -59,15 +59,6 @@ public interface AlertRepository extends JpaRepository<Alert, UUID> {
     boolean existsByUserIdAndIsActive(UUID userId, Boolean isActive);
 
     /**
-     * Check if an alert exists for a specific opportunity and alert type.
-     *
-     * @param opportunityId the opportunity's ID
-     * @param alertType the alert type
-     * @return true if alert exists, false otherwise
-     */
-    boolean existsByOpportunityIdAndAlertType(UUID opportunityId, String alertType);
-
-    /**
      * Count alerts created between start and end time.
      *
      * @param startTime start timestamp
