@@ -80,3 +80,21 @@ athena:
     loader:
       sam-gov:
         data-directory: ${SAM_GOV_DATA_DIR:./data/sam-gov}
+
+  # AI Scoring Configuration
+  scoring:
+    company-capabilities: ${COMPANY_CAPABILITIES:Government contracting experience with cloud infrastructure, cybersecurity, and data analytics}
+
+  # Alert Configuration
+  alerts:
+    enabled: ${ALERTS_ENABLED:true}
+    high-score-threshold: ${HIGH_SCORE_THRESHOLD:80}
+    lookback-hours: ${LOOKBACK_HOURS:24}
+    high-score-cron: ${HIGH_SCORE_CRON:0 0 8 * * MON-FRI}
+    recipient-email: ${ALERTS_RECIPIENT_EMAIL:}
+
+  # Weekly Digest Configuration
+  digest:
+    enabled: ${DIGEST_ENABLED:true}
+    weekly-cron: ${WEEKLY_DIGEST_CRON:0 0 9 * * MON}
+    recipient-email: ${DIGEST_RECIPIENT_EMAIL:}

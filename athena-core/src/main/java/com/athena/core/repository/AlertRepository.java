@@ -4,6 +4,7 @@ import com.athena.core.entity.Alert;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,4 +57,22 @@ public interface AlertRepository extends JpaRepository<Alert, UUID> {
      * @return true if active alerts exist, false otherwise
      */
     boolean existsByUserIdAndIsActive(UUID userId, Boolean isActive);
+
+    /**
+     * Check if an alert exists for a specific opportunity and alert type.
+     *
+     * @param opportunityId the opportunity's ID
+     * @param alertType the alert type
+     * @return true if alert exists, false otherwise
+     */
+    boolean existsByOpportunityIdAndAlertType(UUID opportunityId, String alertType);
+
+    /**
+     * Count alerts created between start and end time.
+     *
+     * @param startTime start timestamp
+     * @param endTime end timestamp
+     * @return count of alerts
+     */
+    long countByCreatedAtBetween(Instant startTime, Instant endTime);
 }
