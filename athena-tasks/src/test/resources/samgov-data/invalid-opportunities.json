@@ -1,0 +1,34 @@
+[
+  {
+    "noticeId": null,
+    "title": "Missing Notice ID - Should Fail Validation",
+    "solicitationNumber": "INVALID-001",
+    "department": "Test Department",
+    "responseDeadLine": "2025-02-01T17:00:00Z",
+    "naicsCode": "541512"
+  },
+  {
+    "noticeId": "INVALID-002",
+    "title": null,
+    "solicitationNumber": "INVALID-002",
+    "department": "Test Department",
+    "responseDeadLine": "2025-02-01T17:00:00Z",
+    "naicsCode": "541512"
+  },
+  {
+    "noticeId": "INVALID-003",
+    "title": "Invalid Date Format",
+    "solicitationNumber": "INVALID-003",
+    "department": "Test Department",
+    "postedDate": "not-a-date",
+    "responseDeadLine": "2025-02-01T17:00:00Z",
+    "naicsCode": "541512"
+  },
+  {
+    "noticeId": "INVALID-004",
+    "title": "Missing Required NAICS Code",
+    "solicitationNumber": "INVALID-004",
+    "department": "Test Department",
+    "responseDeadLine": "2025-02-01T17:00:00Z"
+  }
+]
