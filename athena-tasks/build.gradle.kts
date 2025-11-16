@@ -27,4 +27,7 @@ dependencies {
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
     testImplementation("org.springframework.batch:spring-batch-test:5.1.0")
+    testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.testcontainers:postgresql:1.19.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
 }

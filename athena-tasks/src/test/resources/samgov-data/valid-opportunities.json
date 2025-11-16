@@ -1,0 +1,167 @@
+[
+  {
+    "noticeId": "TEST-NOTICE-001",
+    "title": "IT Services for Federal Agency",
+    "solicitationNumber": "SOL-2025-001",
+    "department": "Department of Defense",
+    "subTier": "Army",
+    "office": "Army Corps of Engineers",
+    "postedDate": "2025-01-15T10:00:00Z",
+    "type": "Combined Synopsis/Solicitation",
+    "baseType": "Solicitation",
+    "archiveType": "auto15",
+    "archiveDate": "2025-02-15T10:00:00Z",
+    "typeOfSetAsideDescription": "Total Small Business Set-Aside (FAR 19.5)",
+    "typeOfSetAside": "SBA",
+    "responseDeadLine": "2025-02-01T17:00:00Z",
+    "naicsCode": "541512",
+    "classificationCode": "D307",
+    "active": "Yes",
+    "award": null,
+    "pointOfContact": [
+      {
+        "fax": null,
+        "type": "primary",
+        "email": "contracting.officer@army.mil",
+        "phone": "555-0100",
+        "title": null,
+        "fullName": "John Smith"
+      }
+    ],
+    "description": "The U.S. Army Corps of Engineers requires comprehensive IT services including software development, system administration, and technical support for a period of 5 years.",
+    "organizationType": "OFFICE",
+    "officeAddress": {
+      "zipcode": "22060",
+      "city": "Alexandria",
+      "countryCode": "USA",
+      "state": "VA"
+    },
+    "placeOfPerformance": {
+      "city": {
+        "code": "12345",
+        "name": "Alexandria"
+      },
+      "state": {
+        "code": "VA",
+        "name": "Virginia"
+      },
+      "country": {
+        "code": "USA",
+        "name": "United States"
+      },
+      "zip": "22060"
+    },
+    "additionalInfoLink": "https://sam.gov/opp/TEST-NOTICE-001/view",
+    "uiLink": "https://sam.gov/opp/TEST-NOTICE-001/view"
+  },
+  {
+    "noticeId": "TEST-NOTICE-002",
+    "title": "Cloud Infrastructure Services",
+    "solicitationNumber": "SOL-2025-002",
+    "department": "General Services Administration",
+    "subTier": "Federal Acquisition Service",
+    "office": "Assisted Acquisition Services",
+    "postedDate": "2025-01-16T14:30:00Z",
+    "type": "Solicitation",
+    "baseType": "Solicitation",
+    "archiveType": "auto15",
+    "archiveDate": "2025-02-16T14:30:00Z",
+    "typeOfSetAsideDescription": null,
+    "typeOfSetAside": null,
+    "responseDeadLine": "2025-02-05T12:00:00Z",
+    "naicsCode": "518210",
+    "classificationCode": "D308",
+    "active": "Yes",
+    "award": null,
+    "pointOfContact": [
+      {
+        "fax": null,
+        "type": "primary",
+        "email": "jane.doe@gsa.gov",
+        "phone": "555-0200",
+        "title": "Contracting Officer",
+        "fullName": "Jane Doe"
+      }
+    ],
+    "description": "GSA seeks cloud infrastructure services to support federal agencies. Services include IaaS, PaaS, and managed services with FedRAMP High authorization.",
+    "organizationType": "OFFICE",
+    "officeAddress": {
+      "zipcode": "20405",
+      "city": "Washington",
+      "countryCode": "USA",
+      "state": "DC"
+    },
+    "placeOfPerformance": {
+      "city": {
+        "code": "56789",
+        "name": "Washington"
+      },
+      "state": {
+        "code": "DC",
+        "name": "District of Columbia"
+      },
+      "country": {
+        "code": "USA",
+        "name": "United States"
+      },
+      "zip": "20405"
+    },
+    "additionalInfoLink": "https://sam.gov/opp/TEST-NOTICE-002/view",
+    "uiLink": "https://sam.gov/opp/TEST-NOTICE-002/view"
+  },
+  {
+    "noticeId": "TEST-NOTICE-003",
+    "title": "Cybersecurity Assessment Services",
+    "solicitationNumber": "SOL-2025-003",
+    "department": "Department of Homeland Security",
+    "subTier": "Cybersecurity and Infrastructure Security Agency",
+    "office": "National Cybersecurity Assessments and Technical Services",
+    "postedDate": "2025-01-17T09:00:00Z",
+    "type": "Sources Sought",
+    "baseType": "Special Notice",
+    "archiveType": "auto15",
+    "archiveDate": "2025-02-17T09:00:00Z",
+    "typeOfSetAsideDescription": null,
+    "typeOfSetAside": null,
+    "responseDeadLine": "2025-01-31T17:00:00Z",
+    "naicsCode": "541512",
+    "classificationCode": "R425",
+    "active": "Yes",
+    "award": null,
+    "pointOfContact": [
+      {
+        "fax": null,
+        "type": "primary",
+        "email": "robert.jones@cisa.dhs.gov",
+        "phone": "555-0300",
+        "title": "Program Manager",
+        "fullName": "Robert Jones"
+      }
+    ],
+    "description": "CISA is conducting market research for cybersecurity assessment and penetration testing services to support critical infrastructure protection. This is a sources sought notice only.",
+    "organizationType": "OFFICE",
+    "officeAddress": {
+      "zipcode": "20528",
+      "city": "Washington",
+      "countryCode": "USA",
+      "state": "DC"
+    },
+    "placeOfPerformance": {
+      "city": {
+        "code": "99999",
+        "name": "Various Locations"
+      },
+      "state": {
+        "code": "DC",
+        "name": "District of Columbia"
+      },
+      "country": {
+        "code": "USA",
+        "name": "United States"
+      },
+      "zip": "20528"
+    },
+    "additionalInfoLink": "https://sam.gov/opp/TEST-NOTICE-003/view",
+    "uiLink": "https://sam.gov/opp/TEST-NOTICE-003/view"
+  }
+]
