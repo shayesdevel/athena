@@ -9,20 +9,15 @@ dependencies {
     // Spring Boot - Batch
     implementation("org.springframework.boot:spring-boot-starter-batch:3.2.0")
 
-    // Spring Boot - Task Scheduling
-    implementation("org.springframework:spring-context:6.1.2")
+    // Spring Boot - Core (for @Scheduled)
+    implementation("org.springframework.boot:spring-boot-starter:3.2.0")
 
-    // Redis (for distributed locking, task coordination)
-    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.2.0")
+    // Spring Data JPA (for repository builders used in batch jobs)
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0")
 
-    // PDF processing
-    implementation("org.apache.pdfbox:pdfbox:3.0.1")
-
-    // Excel export
-    implementation("org.apache.poi:poi-ooxml:5.2.5")
-
-    // Email (SMTP)
-    implementation("org.springframework.boot:spring-boot-starter-mail:3.2.0")
+    // JSON processing (needed for SAM.gov data parsing)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
