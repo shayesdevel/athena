@@ -8,6 +8,15 @@ dependencies {
     // Spring Boot - Data JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0")
 
+    // Spring Boot - WebClient (for HTTP API clients)
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.0")
+
+    // Spring Boot - Email (for SMTP client)
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.2.0")
+
+    // JSON processing (for SAM.gov file parsing and API responses)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+
     // PostgreSQL + pgvector
     implementation("org.postgresql:postgresql:42.7.1")
 
@@ -19,20 +28,18 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
     implementation("org.glassfish:jakarta.el:4.0.2")
 
-    // HTTP Client for external APIs
-    implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.0")
-
-    // JSON processing (Jackson already included in Spring Boot)
+    // JSON processing (Jackson with Java 8 date/time support)
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-
-    // Email support
-    implementation("org.springframework.boot:spring-boot-starter-mail:3.2.0")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
+    // External client testing
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")      // Backend Architect's HTTP mocking
+    testImplementation("org.wiremock:wiremock-standalone:3.3.1")          // QA Specialist's HTTP mocking
+    testImplementation("com.icegreen:greenmail-junit5:2.0.1")             // SMTP testing
 }
