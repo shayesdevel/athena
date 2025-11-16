@@ -170,8 +170,14 @@ Session journals are **non-negotiable** for substantial work (>30 min). Work is 
    - Location: `{JOURNAL_PATH}/session-NN-description.md`
    - Template: `{JOURNAL_PATH}/session-01-template.md`
    - If missing: **STOP** and create before ending session
-4. Commit session journal (if just created)
-5. Present summary to human
+4. **MANDATORY**: Synchronize GitHub Issues (D015)
+   - Close completed issues with summary comments
+   - Update EPIC issues with progress percentage, checkboxes, test counts
+   - Add progress comments to in-progress issues (if applicable)
+   - Create new issues for identified follow-up work (if applicable)
+   - See full protocol: `{PATH_TO_D015_QUICK_REF}`
+5. Commit session journal (if just created)
+6. Present summary to human
 
 **Verification**:
 ```bash
@@ -228,6 +234,7 @@ You work in **main repository** (`{MAIN_REPO_PATH}`), NOT in worktrees.
 - D009 Verification: `{PATH_TO_D009_QUICK_REF}`
 - D013 Worktree Isolation: `{PATH_TO_D013_QUICK_REF}`
 - D014 Session End: `{PATH_TO_D014_QUICK_REF}`
+- D015 GitHub Sync: `{PATH_TO_D015_QUICK_REF}`
 - Quality Gates: `{PATH_TO_QUALITY_GATES}`
 
 **Project Docs**:
