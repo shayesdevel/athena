@@ -233,7 +233,69 @@ grep -r "athena-" ../../docs/
 
 ---
 
-## Gate 5: Post-Merge Verification (AFTER PR merged)
+## Gate 5: Session Close (END of Session - D014/D015)
+
+**When**: At end of every session (triggered by "end session", "wrap up", etc.)
+**Purpose**: Ensure session work is documented and GitHub issues synchronized
+**Who**: Orchestrator (Nexus) executes as part of D014 End-Session Protocol
+
+### Session Journal Published
+- [ ] **Session journal created and committed**: `docs/00-active/journal/session-{N}.md`
+- [ ] Journal includes: Milestones, decisions (DEC-{N}-{X}), issues (ISSUE-{N}-{X}), metrics
+- [ ] Journal follows D014 template format
+- [ ] Journal committed and pushed to GitHub:
+  ```bash
+  # Verify session journal exists and is committed
+  git log --oneline --all -- docs/00-active/journal/session-*.md | head -5
+  ```
+
+### GitHub Issues Synchronized (D015)
+- [ ] **All completed issues closed** with summary comments:
+  ```bash
+  # Example close command (orchestrator executes)
+  gh issue close N --comment "✅ COMPLETED in Session {N}
+
+  **Summary**: Brief description
+  **Implementation**: PR #{M}
+  **Testing**: {T} tests added, all passing
+  **Session**: See docs/00-active/journal/session-{N}.md"
+  ```
+- [ ] **EPIC issues updated** with:
+  - Checked boxes for completed phases/milestones
+  - Progress percentage (e.g., "3/11 phases = 27%")
+  - Test count (current total + delta from session)
+  - "Recent Activity" section with session summary
+- [ ] **In-progress issues commented** with session progress (if applicable)
+- [ ] **New issues created** for follow-up work identified (if applicable)
+
+### Decision Documentation
+- [ ] **All decisions documented** in MEMORY.md (if architectural/technical decisions made)
+- [ ] Decision format: DEC-{N}-{X} with date, context, rationale, consequences
+- [ ] MEMORY.md committed if updated
+
+### D015 Verification
+```bash
+# Verify GitHub is synchronized
+# Check closed issues reference this session
+gh issue list --state closed --search "COMPLETED in Session {N}"
+
+# Check EPIC updated (example for EPIC #1)
+gh issue view 1 | grep "Session {N}"
+
+# Verify session journal exists
+ls docs/00-active/journal/session-{N}.md
+```
+
+**See Full Protocols**:
+- D014: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/protocols/D014-END-SESSION-PROTOCOL.md`
+- D015: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/protocols/D015-GITHUB-SYNC-PROTOCOL.md`
+- D015 Quick Ref: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/quick-reference/d015-github-sync-quick-ref.md`
+
+**If ANY session close check fails: Session is NOT complete - fix before ending**
+
+---
+
+## Gate 6: Post-Merge Verification (AFTER PR merged)
 
 ### Tracking Updates
 - [ ] GitHub issue status updated (closed or commented)
@@ -345,8 +407,10 @@ grep -r "athena-" ../../docs/
 - [ ] ✅ CI/CD passing (Gate 4 - once configured)
 - [ ] ✅ No merge conflicts (Gate 4)
 - [ ] ✅ PR merged (Gate 4)
-- [ ] ✅ GitHub issue updated (Gate 5)
-- [ ] ✅ Post-merge verification passed (Gate 5)
+- [ ] ✅ **Session journal published and pushed** (Gate 5 - MANDATORY)
+- [ ] ✅ **GitHub issues synchronized** (Gate 5 - D015 protocol)
+- [ ] ✅ GitHub issue updated (Gate 6)
+- [ ] ✅ Post-merge verification passed (Gate 6)
 
 **Only report work as complete after ALL checkboxes ticked**
 

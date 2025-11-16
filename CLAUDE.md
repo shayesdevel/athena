@@ -113,6 +113,11 @@ This project enforces the following **D-series protocols** from the cognitive fr
 - **Purpose**: Structured handoff between sessions
 - **Quick Ref**: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/quick-reference/D014-quick-ref.md`
 
+**D015: GitHub Issue Synchronization**
+- **Purpose**: Keep GitHub issues synchronized with project status
+- **When**: At session end (part of D014 protocol)
+- **Quick Ref**: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/quick-reference/d015-github-sync-quick-ref.md`
+
 ### Optional Protocols
 
 **D009b: Post-PR Verification**
