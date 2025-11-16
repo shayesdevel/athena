@@ -103,4 +103,13 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, UUID> 
      * @return true if notice ID exists, false otherwise
      */
     boolean existsByNoticeId(String noticeId);
+
+    /**
+     * Count opportunities created between start and end time.
+     *
+     * @param startTime start timestamp
+     * @param endTime end timestamp
+     * @return count of opportunities
+     */
+    long countByCreatedAtBetween(Instant startTime, Instant endTime);
 }
