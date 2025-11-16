@@ -336,6 +336,91 @@
 
 ---
 
+### MEM-013: D015 GitHub Issue Synchronization Protocol
+**Date**: 2025-11-15
+**Status**: ACCEPTED
+**Deciders**: Nexus (Orchestrator)
+**Category**: [PROCESS]
+
+**Decision**: Establish D015 GitHub Issue Synchronization Protocol as a mandatory Critical Protocol for all sessions
+
+**Context**:
+- GitHub issues used for work tracking and project management
+- Issues often not updated or closed at session end (manual process, easy to forget)
+- GitHub issue tracker becoming stale, not reflecting real-time project status
+- Stakeholders relying on GitHub for visibility into progress
+- Need automated synchronization between session work and GitHub issue state
+
+**What D015 Does**:
+- **Trigger**: Executes at end of every session (integrated with D014 Session End Protocol)
+- **Actions**:
+  1. Close completed GitHub issues with standardized summary
+  2. Update in-progress issues with current status
+  3. Link session journal to relevant issues
+  4. Provide commit references, file changes, completion details
+- **Format**: Structured completion summary (commits, files, links, blockers)
+- **Integration**: Embedded in D014 workflow, verified by Gate 5 (Session Close)
+
+**Protocol Structure**:
+```
+At session end (D014 workflow):
+1. Identify issues worked on during session
+2. For each completed issue:
+   - Close with completion summary
+   - Include: commits made, files affected, tests passing
+   - Link to session journal
+3. For each in-progress issue:
+   - Update with current status
+   - Note blockers if any
+4. Update session journal with issue links
+```
+
+**Why This Matters**:
+- **Visibility**: Stakeholders see real-time progress without reading session journals
+- **Accuracy**: GitHub becomes single source of truth for project status
+- **Automation**: Reduces manual overhead, prevents forgotten updates
+- **Quality**: Forces session-end review of work accomplished
+- **Integration**: Natural fit with existing D014 protocol
+
+**Consequences**:
+- ✅ **Positive**:
+  - GitHub issue tracker always current and accurate
+  - Better stakeholder communication (no need to ask "what's the status?")
+  - Automatic documentation of work completed
+  - Reduces orchestrator mental overhead (automated, not manual)
+  - Forces reflection on session accomplishments (quality gate)
+- ⚠️ **Negative**:
+  - Additional step at session end (~1-2 minutes)
+  - Requires GitHub CLI access (gh command)
+  - Assumes 1:1 or N:1 mapping (issues → session work)
+- 🔧 **Mitigation**:
+  - Protocol is quick and well-documented
+  - GitHub CLI already used for PR creation (no new dependency)
+  - Value outweighs time cost (better visibility worth 2 minutes)
+  - Can batch-update multiple issues efficiently
+
+**Implementation**:
+- Full protocol: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/protocols/D015-GITHUB-SYNC-PROTOCOL.md`
+- Quick reference: `/home/shayesdevel/projects/cognitive-framework/cognitive-core/quality-collaboration/quick-reference/d015-github-sync-quick-ref.md`
+- Integrated into CLAUDE.md (Critical Protocols section)
+- Added to quality-gates.md (Gate 5: Session Close)
+- Embedded in orchestrator-template.md (D014 workflow step)
+
+**First Application**:
+- Session 08: Closed Issue #21 using D015 protocol
+- Demonstrated protocol effectiveness
+- Validated workflow integration with D014
+
+**Related**:
+- D014 Session End Protocol (D015 executes as part of D014)
+- Gate 5 (Session Close): Verifies D014 + D015 compliance
+- Issue #21: Implementation work for D015
+- Session 08 Journal: First practical application
+
+**Impact**: MANDATORY for all future sessions - all agents must execute D015 at session close
+
+---
+
 ## Decision Status Definitions
 
 **PROPOSED**: Decision suggested but not yet accepted
@@ -367,6 +452,10 @@ Tag decisions with categories for easier navigation:
 | MEM-004 | 2025-11-15 | Multi-Module Gradle Project | ACCEPTED | [ARCHITECTURE] |
 | MEM-005 | 2025-11-15 | SAM.gov Data Source (Cached JSON) | ACCEPTED | [CONSTRAINTS] |
 | MEM-006 | 2025-11-15 | Testcontainers Integration Test Config | ACCEPTED | [TECH_STACK] |
+| MEM-010 | 2025-11-15 | Service Layer Package Structure | ACCEPTED | [ARCHITECTURE] |
+| MEM-011 | 2025-11-15 | DTO Relationship Handling Pattern | ACCEPTED | [ARCHITECTURE] |
+| MEM-012 | 2025-11-15 | Repository Test Configuration | ACCEPTED | [TECH_STACK] |
+| MEM-013 | 2025-11-15 | D015 GitHub Issue Synchronization | ACCEPTED | [PROCESS] |
 
 ---
 
@@ -779,3 +868,12 @@ class AttachmentRepositoryTest extends AbstractIntegrationTest {
 - Resolved duplicate impl/ subdirectory issue (MEM-010 enforcement)
 - D009b verification passed, all 501 tests green
 - Phase 5: 100% COMPLETE
+
+**2025-11-15 (Session 08)**: D015 GitHub Issue Synchronization Protocol
+- Created D015 protocol in cognitive-framework repository
+- Integrated D015 into Athena project (quality gates, CLAUDE.md, orchestrator template)
+- Created MEM-013: D015 GitHub Issue Synchronization as Critical Protocol
+- Fixed hook configuration (removed non-existent PreToolUse/PostToolUse hooks)
+- Closed Issue #21 using D015 protocol (first application)
+- Added Gate 5 (Session Close) to quality gates
+- Total Critical Protocols: 5 (D009, D012, D013, D014, D015)
